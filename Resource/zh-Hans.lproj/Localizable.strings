@@ -40,7 +40,7 @@
 "cpu.thermal_level" = "温度等级";
 "cpu.system" = "系统";
 "cpu.user" = "用户";
-"cpu.nice" = "Nice";
+"cpu.nice" = "友好值";
 "cpu.waiting_status_report" = "正在等待状态更新";
 
 // MARK: Fan
