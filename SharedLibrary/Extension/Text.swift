@@ -56,16 +56,4 @@ public extension Text {
         font(.system(size: 12, weight: .regular))
             .foregroundColor(.secondary)
     }
-
-    func widgetTitle() -> some View {
-        font(.system(size: 40, weight: .heavy))
-            .scaledToFill()
-            .minimumScaleFactor(0.3)
-    }
-
-    func widgetDisplayText() -> some View {
-        font(.system(size: 24, weight: .heavy))
-            .scaledToFill()
-            .minimumScaleFactor(0.5)
-    }
 }

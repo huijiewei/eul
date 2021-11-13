@@ -32,47 +32,7 @@ extension Preference {
                         }
                         .focusable(false)
                     }
-                    HStack(spacing: 6) {
-                        if preference.isUpdateAvailable == nil {
-                            ActivityIndicatorView {
-                                $0.style = .spinning
-                                $0.controlSize = .small
-                                $0.startAnimation(nil)
-                            }
-                            Text("ui.checking_update".localized())
-                                .inlineSection()
-                                .foregroundColor(.info)
-                        } else if preference.checkUpdateFailed {
-                        } else if preference.isUpdateAvailable == true {
-                            preference.latestReleaseURL.map { url in
-                                Button(action: {
-                                    NSWorkspace.shared.open(url)
-                                }) {
-                                    Text("ui.download".localized())
-                                }
-                                .focusable(false)
-                            }
-                            Text("ui.new_version".localized())
-                                .inlineSection()
-                                .foregroundColor(.info)
-                        } else {
-                            Text("ui.up_to_date".localized())
-                                .inlineSection()
-                                .foregroundColor(.info)
-                        }
-                    }
-                    .fixedSize()
                 }
-                Picker("ui.upgrade_method".localized(), selection: $preference.upgradeMethod) {
-                    ForEach(PreferenceStore.UpgradeMethod.allCases, id: \.self) {
-                        Text("ui.upgrade_method.\($0)".localized())
-                            .tag($0)
-                    }
-                }
-                .fixedSize()
-                Text("ui.upgrade_method.\(preference.upgradeMethod.rawValue).description".localized())
-                    .secondaryDisplayText()
-                    .padding(.bottom, 8)
                 Toggle(isOn: $launchAtLogin.isEnabled) {
                     Text("ui.launch_at_login".localized())
                         .inlineSection()

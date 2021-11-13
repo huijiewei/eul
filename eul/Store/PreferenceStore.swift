@@ -12,15 +12,8 @@ import Foundation
 import Localize_Swift
 import SharedLibrary
 import SwiftyJSON
-import WidgetKit
 
 class PreferenceStore: ObservableObject {
-    enum UpgradeMethod: String, CaseIterable {
-        case none
-        case showInStatusBar
-        case autoUpdate
-    }
-
     static var availableLanguages: [String] {
         Localize.availableLanguages().filter { $0 != "Base" }
     }
@@ -30,10 +23,6 @@ class PreferenceStore: ObservableObject {
     private var cancellable: AnyCancellable?
     var repoURL: URL? {
         URL(string: "https://github.com/\(repo)")
-    }
-
-    var latestReleaseURL: URL? {
-        URL(string: "https://github.com/\(repo)/releases/latest")
     }
 
     var version: String? {
@@ -62,9 +51,6 @@ class PreferenceStore: ObservableObject {
     @Published var showNetworkTopActivities = false
     @Published var cpuMenuDisplay: Preference.CpuMenuDisplay = .usagePercentage
     @Published var checkStatusItemVisibility = true
-    @Published var upgradeMethod = UpgradeMethod.showInStatusBar
-    @Published var isUpdateAvailable: Bool? = false
-    @Published var checkUpdateFailed = true
     @Published var appearanceMode = Preference.appearance.auto
 
     var json: JSON {
@@ -82,53 +68,17 @@ class PreferenceStore: ObservableObject {
             "cpuMenuDisplay": cpuMenuDisplay.rawValue,
             "checkStatusItemVisibility": checkStatusItemVisibility,
             "appearance": appearanceMode.rawValue,
-            "upgradeMethod": upgradeMethod.rawValue,
 
         ])
     }
 
     init() {
         loadFromDefaults()
-        writeToContainer()
 
         cancellable = objectWillChange.sink {
             DispatchQueue.main.async {
                 self.saveToDefaults()
-                self.writeToContainer()
             }
-        }
-    }
-
-    func checkUpdate() {
-        isUpdateAvailable = nil
-        checkUpdateFailed = false
-
-        let session = URLSession.shared
-        let url = URL(string: "https://api.github.com/repos/\(repo)/releases/latest")
-
-        if let url = url {
-            let task = session.dataTask(with: url) { data, _, error in
-                DispatchQueue.main.async {
-                    if
-                        error == nil,
-                        let version = self.version,
-                        let tagName = JSON(data as Any)["tag_name"].string,
-                        "v\(version)".compare(tagName, options: .numeric) == .orderedAscending
-                    {
-                        self.isUpdateAvailable = true
-
-                        if self.upgradeMethod == .autoUpdate {
-                            AutoUpdate.run()
-                        }
-                    } else {
-                        self.isUpdateAvailable = false
-                    }
-                }
-            }
-            task.resume()
-        } else {
-            isUpdateAvailable = false
-            checkUpdateFailed = true
         }
     }
 
@@ -178,9 +128,6 @@ class PreferenceStore: ObservableObject {
                 if let raw = data["appearance"].string, let value = Preference.appearance(rawValue: raw) {
                     appearanceMode = value
                 }
-                if let raw = data["upgradeMethod"].string, let value = UpgradeMethod(rawValue: raw) {
-                    upgradeMethod = value
-                }
             } catch {
                 print("Unable to get preference data from user defaults")
             }
@@ -193,13 +140,6 @@ class PreferenceStore: ObservableObject {
             UserDefaults.standard.set(data, forKey: userDefaultsKey)
         } catch {
             print("Unable to save preference")
-        }
-    }
-
-    func writeToContainer() {
-        Container.set(PreferenceEntry(temperatureUnit: temperatureUnit))
-        if #available(OSX 11, *) {
-            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 }

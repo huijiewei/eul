@@ -15,7 +15,6 @@ import SwiftUI
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var isSleeping = false
-    private var updateMethodCancellable: AnyCancellable?
     private var appearanceCancellable: AnyCancellable?
 
     var window: NSWindow!
@@ -55,11 +54,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             print("🤩 woke up")
             self.wakeUp()
         }
-        updateMethodCancellable = preferenceStore.$upgradeMethod.sink { _ in
-            DispatchQueue.main.async {
-                self.checkUpdateRepeatedly()
-            }
-        }
 
         // Disable in Catalina to avoid protential crash
         if #available(OSX 11, *) {
@@ -81,7 +75,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         isSleeping = false
         refreshSMCRepeatedly()
         refreshNetworkRepeatedly()
-        checkUpdateRepeatedly()
     }
 
     func sleep() {
@@ -133,17 +126,6 @@ extension AppDelegate {
         NotificationCenter.default.post(name: .NetworkShouldRefresh, object: nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + Double(preferenceStore.networkRefreshRate)) { [self] in
             refreshNetworkRepeatedly()
-        }
-    }
-
-    func checkUpdateRepeatedly() {
-        guard !isSleeping, preferenceStore.upgradeMethod != .none else {
-            return
-        }
-
-        preferenceStore.checkUpdate()
-        DispatchQueue.main.asyncAfter(deadline: .now() + Double(60 * 60)) { [self] in
-            checkUpdateRepeatedly()
         }
     }
 }

@@ -9,7 +9,6 @@
 import Foundation
 import SharedLibrary
 import SystemKit
-import WidgetKit
 
 class BatteryStore: ObservableObject, Refreshable {
     private var battery = Battery()
@@ -54,16 +53,6 @@ class BatteryStore: ObservableObject, Refreshable {
         cycleCount = battery.cycleCount()
         timeRemaining = io.powerSource == .battery ? battery.timeRemainingFormatted() : "∞"
         _ = battery.close()
-        writeToContainer()
-    }
-
-    func writeToContainer() {
-        Container.set(BatteryEntry(
-            isCharging: charging, acPowered: acPowered, charge: charge, capacity: capacity, maxCapacity: maxCapacity, designCapacity: designCapacity, cycleCount: cycleCount, condition: io.condition
-        ))
-        if #available(OSX 11, *) {
-            WidgetCenter.shared.reloadTimelines(ofKind: BatteryEntry.kind)
-        }
     }
 
     init() {

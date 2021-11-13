@@ -9,7 +9,6 @@
 import Foundation
 import SharedLibrary
 import SystemKit
-import WidgetKit
 
 class CpuStore: ObservableObject, Refreshable {
     @Published var temp: Double?
@@ -78,19 +77,6 @@ class CpuStore: ObservableObject, Refreshable {
         getInfo()
         getUsage()
         getTemp()
-        writeToContainer()
-    }
-
-    func writeToContainer() {
-        Container.set(CpuEntry(
-            temp: temp,
-            usageSystem: usageCPU?.system,
-            usageUser: usageCPU?.user,
-            usageNice: usageCPU?.nice
-        ))
-        if #available(OSX 11, *) {
-            WidgetCenter.shared.reloadTimelines(ofKind: CpuEntry.kind)
-        }
     }
 
     init() {

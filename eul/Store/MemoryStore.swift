@@ -9,7 +9,6 @@
 import Foundation
 import SharedLibrary
 import SystemKit
-import WidgetKit
 
 class MemoryStore: ObservableObject, Refreshable {
     @Published var free: Double = 0
@@ -58,14 +57,6 @@ class MemoryStore: ObservableObject, Refreshable {
         (free, active, inactive, wired, compressed, appMemory, cachedFiles) = System.memoryUsage()
         temp = SmcControl.shared.memoryProximityTemperature
         usageHistory = (usageHistory + [usedPercentage]).suffix(LineChart.defaultMaxPointCount)
-        writeToContainer()
-    }
-
-    func writeToContainer() {
-        Container.set(MemoryEntry(used: used, total: total, temp: temp))
-        if #available(OSX 11, *) {
-            WidgetCenter.shared.reloadTimelines(ofKind: MemoryEntry.kind)
-        }
     }
 
     init() {

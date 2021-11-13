@@ -8,7 +8,6 @@
 
 import Foundation
 import SharedLibrary
-import WidgetKit
 
 class NetworkStore: ObservableObject, Refreshable {
     private var networkUsageHasBeenSet = true
@@ -67,15 +66,7 @@ class NetworkStore: ObservableObject, Refreshable {
             networkUsage = current
             self.ports = ports
             self.currentActivePort = currentActivePort
-            writeToContainer()
             networkUsageHasBeenSet = true
-        }
-    }
-
-    func writeToContainer() {
-        Container.set(NetworkEntry(inSpeedInByte: inSpeedInByte, outSpeedInByte: outSpeedInByte))
-        if #available(OSX 11, *) {
-            WidgetCenter.shared.reloadTimelines(ofKind: NetworkEntry.kind)
         }
     }
 

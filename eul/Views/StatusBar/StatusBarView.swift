@@ -28,14 +28,6 @@ struct StatusBarView: SizeChangeView {
                     .resizable()
                     .frame(width: 16, height: 16)
             }
-            if
-                preferenceStore.upgradeMethod == .showInStatusBar,
-                preferenceStore.isUpdateAvailable == true
-            {
-                Image("Upgrade")
-                    .resizable()
-                    .frame(width: 12, height: 12)
-            }
         }
         .fixedSize()
         .background(GeometryReader { self.reportSize($0) })

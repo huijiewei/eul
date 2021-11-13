@@ -11,13 +11,25 @@ import IOKit.ps
 import SharedLibrary
 import SystemKit
 
-extension BatteryEntry.BatteryCondition {
+public enum BatteryCondition: String, Codable {
+    case good
+    case fair
+    case poor
+}
+
+public enum PowerSourceState: String, Codable {
+    case battery
+    case acPower
+    case unknown
+}
+
+extension BatteryCondition {
     var description: String {
         "battery.condition.\(rawValue)".localized()
     }
 }
 
-extension BatteryEntry.PowerSourceState {
+extension PowerSourceState {
     var description: String {
         "battery.power_source.\(rawValue)".localized()
     }
@@ -38,8 +50,8 @@ enum Info {
             Double(currentCapacity) / Double(maxCapacity)
         }
 
-        var condition: BatteryEntry.BatteryCondition = .good
-        var powerSource: BatteryEntry.PowerSourceState = .unknown
+        var condition: BatteryCondition = .good
+        var powerSource: PowerSourceState = .unknown
         var timeToFullCharge = 0
         var timeToEmpty = 0
         var isCharged = false
